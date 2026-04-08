@@ -1,0 +1,21 @@
+# Données (trop lourdes pour git)
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Fichiers de test locaux
+src/test_*.html
+src/test_quick.py
