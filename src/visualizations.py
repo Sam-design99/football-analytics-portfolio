@@ -247,6 +247,8 @@ def player_radar(players_stats: dict, title: str = "Comparaison joueurs") -> go.
 
     # Récupère les catégories depuis le premier joueur
     categories = list(next(iter(players_stats.values())).keys())
+    if not categories:
+        return go.Figure()
     categories_closed = categories + [categories[0]]  # fermer le polygone
 
     palette = ["#1D9E75", "#EF9F27", "#378ADD", "#E24B4A"]

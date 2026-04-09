@@ -257,10 +257,12 @@ with tab2:
         st.subheader("Radar comparatif")
         all_players = [selected_player] + compare_players
         radar_data = normalize_stats_for_radar(p_stats, all_players)
-        if radar_data:
+        if radar_data and len(radar_data) >= 2:
             fig_radar = player_radar(radar_data,
                                      title=f"Comparaison — {' vs '.join(all_players)}")
             st.plotly_chart(fig_radar, use_container_width=True)
+        else:
+            st.info("Pas assez de données pour générer le radar. Essaie avec d'autres joueurs.")
 
     st.subheader("Tableau complet des joueurs")
     display_p_cols = [c for c in ["player", "team", "shots", "xG", "passes_total",
