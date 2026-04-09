@@ -21,6 +21,7 @@ from visualizations import (
     shot_map, heatmap, player_radar,
     pass_network, xg_timeline, normalize_stats_for_radar
 )
+from video_page import render_video_page
 
 # ─────────────────────────────────────────────
 # CONFIG PAGE
@@ -177,7 +178,7 @@ st.markdown("---")
 # ONGLETS PRINCIPAUX
 # ─────────────────────────────────────────────
 
-tab1, tab2, tab3 = st.tabs(["📊 Vue Match", "👤 Analyse Joueur", "🔗 Réseau de Passes"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Vue Match", "👤 Analyse Joueur", "🔗 Réseau de Passes", "🎥 Analyse Vidéo"])
 
 
 # ── TAB 1 : VUE MATCH ──────────────────────────────────────
@@ -256,13 +257,36 @@ with tab2:
     if compare_players:
         st.subheader("Radar comparatif")
         all_players = [selected_player] + compare_players
-        radar_data = normalize_stats_for_radar(p_stats, all_players)
+
+        # Normalisation directe depuis les stats du match
+        radar_cols = {
+            "xG": "xG",
+            "shots": "Tirs",
+            "pass_pct": "Passes %",
+            "dribbles_success": "Dribbles réussis",
+            "passes_total": "Passes",
+        }
+        available_cols = {k: v for k, v in radar_cols.items() if k in p_stats.columns}
+
+        radar_data = {}
+        for player in all_players:
+            row = p_stats[p_stats["player"] == player]
+            if row.empty:
+                continue
+            stats = {}
+            for col, label in available_cols.items():
+                col_max = p_stats[col].max()
+                val = float(row[col].iloc[0])
+                stats[label] = round((val / col_max * 100) if col_max > 0 else 0, 1)
+            if stats:
+                radar_data[player] = stats
+
         if radar_data and len(radar_data) >= 2:
             fig_radar = player_radar(radar_data,
                                      title=f"Comparaison — {' vs '.join(all_players)}")
             st.plotly_chart(fig_radar, use_container_width=True)
         else:
-            st.info("Pas assez de données pour générer le radar. Essaie avec d'autres joueurs.")
+            st.info("Pas assez de données pour générer le radar.")
 
     st.subheader("Tableau complet des joueurs")
     display_p_cols = [c for c in ["player", "team", "shots", "xG", "passes_total",
@@ -297,3 +321,6 @@ with tab3:
     st.plotly_chart(fig_net, use_container_width=True)
 
     st.caption("Taille des nœuds = nombre de passes effectuées · Épaisseur des liens = fréquence de la combinaison")
+
+with tab4:
+    render_video_page()
