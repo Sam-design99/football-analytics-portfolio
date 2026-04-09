@@ -5,3 +5,7 @@ plotly
 streamlit
 scipy
 mplsoccer
+yt-dlp
+opencv-python
+ultralytics
+supervision
